@@ -43,7 +43,7 @@ spring:
           predicates:
             - Path=/api/company/**
           filters:
-            - RewritePath=/api/company/(?<segment>.*), /company/${segment}
+            - RewritePath=/api/company/(?<segment>.*), /api/company/${segment}
       httpclient:
         connect-timeout: 60
         response-timeout: 60s
