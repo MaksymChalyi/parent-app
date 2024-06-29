@@ -10,11 +10,13 @@ services:
       - 'POSTGRES_DB=employee_management'
 
   app:
-    build: ./
+    build:
+      context: ./SpringBootRESTfulAPI
+      dockerfile: Dockerfile
     container_name: 'java-app'
     ports:
       - '8080:8080'
-    env_file: .env
+    env_file: SpringBootRESTfulAPI/.env
     depends_on:
       - postgres
     environment:
@@ -26,4 +28,4 @@ networks:
   default:
     name: my-network
     driver: bridge
-    external: true
+#    external: true
