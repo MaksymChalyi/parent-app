@@ -24,6 +24,39 @@ services:
       - 'DB_USERNAME=postgres'
       - 'DB_PASSWORD=1234'
       - 'KAFKA_ADDRESS=kafka:9092'
+
+  gateway:
+    build:
+      context: ./gateway-service-v2
+      dockerfile: Dockerfile
+    container_name: 'spring-cloud-gatewayV2'
+    ports:
+      - '1000:1000'
+    env_file: gateway-service-v2/.env
+    depends_on:
+      - consul
+#    networks:
+#      - my-network
+
+  #  postgres:
+  #    image: 'postgres:15'
+  #    container_name: 'java-postgres2'
+  #    environment:
+  #      - 'POSTGRES_USER=postgres'
+  #      - 'POSTGRES_HOST_AUTH_METHOD=trust'
+  #      - 'POSTGRES_DB=employee_management'
+  #    networks:
+  #      - my-network  # Додайте цей рядок для підключення до мережі
+
+  consul:
+    image: bitnami/consul
+    container_name: "gws-consul-v2"
+    ports:
+      - "8500:8500"
+    command: "consul agent -dev -ui -client=0.0.0.0"
+#    networks:
+#      - my-network  # Додайте цей рядок для підключення до мережі
+
 networks:
   default:
     name: my-network

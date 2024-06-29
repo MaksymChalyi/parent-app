@@ -2,7 +2,7 @@ version: "3.9"
 services:
   gateway:
     build:
-      context: .
+      context: ./gateway-service-v2
       dockerfile: Dockerfile
     container_name: 'spring-cloud-gatewayV2'
     ports:
