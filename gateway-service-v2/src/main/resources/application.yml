@@ -22,7 +22,6 @@ spring:
     import: optional:consul:/
   cloud:
     consul:
-#      host: localhost
       host: consul
       port: 8500
       discovery:
@@ -33,13 +32,18 @@ spring:
           uri: lb://spring-cloud-gatewayV2
           predicates:
             - Path=/oauth/**
-        - id: java-app-route
-          uri: http://localhost:8080
-#          uri: lb://java-app
+        - id: java-app-employee-route
+          uri: lb://java-app
           predicates:
             - Path=/api/employee/**
           filters:
-            - RewritePath=/api/employee/(?<segment>.*), /employee/${segment}
+            - RewritePath=/api/employee/(?<segment>.*), /api/employee/${segment}
+        - id: java-app-company-route
+          uri: lb://java-app
+          predicates:
+            - Path=/api/company/**
+          filters:
+            - RewritePath=/api/company/(?<segment>.*), /company/${segment}
       httpclient:
         connect-timeout: 60
         response-timeout: 60s
@@ -60,8 +64,6 @@ resilience4j:
           - 2s
         minimum-number-of-calls: 3
         permitted-number-of-calls-in-half-open-state: 1
-
-
 
 management:
   endpoint:
