@@ -1,0 +1,39 @@
+version: "3.9"
+services:
+  gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: 'spring-cloud-gatewayV2'
+    ports:
+      - '1000:1000'
+    env_file:
+      - ./.env
+    depends_on:
+      - consul
+    networks:
+      - my-network  # Додайте цей рядок для підключення до мережі
+
+#  postgres:
+#    image: 'postgres:15'
+#    container_name: 'java-postgres2'
+#    environment:
+#      - 'POSTGRES_USER=postgres'
+#      - 'POSTGRES_HOST_AUTH_METHOD=trust'
+#      - 'POSTGRES_DB=employee_management'
+#    networks:
+#      - my-network  # Додайте цей рядок для підключення до мережі
+
+  consul:
+    image: bitnami/consul
+    container_name: "gws-consul-v2"
+    ports:
+      - "8500:8500"
+    command: "consul agent -dev -ui -client=0.0.0.0"
+    networks:
+      - my-network  # Додайте цей рядок для підключення до мережі
+
+networks:
+  my-network:
+    driver: bridge
+    external: true

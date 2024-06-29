@@ -1,0 +1,74 @@
+server:
+  port: 1000
+  error:
+    include-message: always
+    include-binding-errors: always
+  netty:
+    connection-timeout: 5000
+
+frontend-uri: ${FRONT-END-URI}
+redirect-url: ${REDIRECT-URL}
+
+oauth:
+  google:
+    clientId: ${MY_CLIENT_ID}
+    clientSecret: ${MY_CLIENT_SECRET}
+    scope: "openid profile email"
+
+spring:
+  application:
+    name: gateway
+  config:
+    import: optional:consul:/
+  cloud:
+    consul:
+      host: localhost
+      #      host: consul
+      port: 8500
+      discovery:
+        health-check-path: /health
+    gateway:
+      routes:
+        - id: gateway-oauth-route
+          uri: lb://spring-cloud-gatewayV2
+          predicates:
+            - Path=/oauth/**
+        - id: java-app-route
+          uri: http://localhost:8080
+#          uri: lb://java-app
+          predicates:
+            - Path=/api/employee/**
+          filters:
+            - RewritePath=/api/employee/(?<segment>.*), /employee/${segment}
+      httpclient:
+        connect-timeout: 60
+        response-timeout: 60s
+  r2dbc:
+    url: "r2dbc:h2:mem:///gwsdb"
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      services:
+        wait-duration-in-open-state: 10s
+        failure-rate-threshold: 60
+        slow-call-duration-threshold:
+          - 2s
+        minimum-number-of-calls: 3
+        permitted-number-of-calls-in-half-open-state: 1
+
+
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include: "*"

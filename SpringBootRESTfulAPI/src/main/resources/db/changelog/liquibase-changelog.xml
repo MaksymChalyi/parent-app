@@ -1,0 +1,67 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="create-schema" author="maksimkaxxl">
+        <createTable tableName="companies">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false" unique="false"/>
+            </column>
+            <column name="industry" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <createTable tableName="employees">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="age" type="INTEGER">
+                <constraints nullable="true"/>
+            </column>
+            <column name="position" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="experience_years" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="company_id" type="BIGINT">
+                <constraints foreignKeyName="FK_employees_company" referencedTableName="companies"
+                             referencedColumnNames="id" nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create_employee_interests_table" author="maksimkaxxl">
+        <createTable tableName="employee_interests">
+            <column name="employee_id" type="BIGINT">
+                <constraints foreignKeyName="fk_employee_interests_employee_id" referencedTableName="employees"/>
+            </column>
+            <column name="interests" type="VARCHAR(255)"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="employee_interests" baseColumnNames="employee_id"
+                                 constraintName="fk_employee_interests_employee_id"
+                                 referencedTableName="employees" referencedColumnNames="id"/>
+
+    </changeSet>
+
+
+    <changeSet id="add_unique_index_to_company_name" author="maksimkaxxl">
+        <createIndex indexName="idx_unique_company_name" tableName="companies" unique="true">
+            <column name="name"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="add_companies_to_db" author="maksimkaxxl">
+        <loadData tableName="companies" file="db/data/companies.csv"/>
+    </changeSet>
+
+
+</databaseChangeLog>

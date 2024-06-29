@@ -1,0 +1,88 @@
+version: "3.9"
+
+services:
+  elasticsearch:
+    image: elasticsearch:8.6.1
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+      - xpack.security.enabled=false
+    volumes:
+      - ./data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    healthcheck:
+      test: curl -s http://elasticsearch:9200 >/dev/null || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 50
+#    networks:
+#      - my-network
+
+  kibana:
+    image: kibana:8.6.1
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+#    networks:
+#      - my-network
+
+  zookeeper:
+    image: 'bitnami/zookeeper:latest'
+    container_name: zookeeper
+    ports:
+      - '2181:2181'
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+#    networks:
+#      - my-network
+
+  kafka:
+    image: 'bitnami/kafka:latest'
+    container_name: kafka
+    ports:
+      - '9092:9092'
+      - '29092:29092'
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,EXTERNAL://:29092  # Оновлення рядка для прослуховування нового порту
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://localhost:29092  # Оновлення рядка з рекламною адресою для нового порту
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT  # Оновлення рядка для прослуховування нового порту
+    depends_on:
+      - zookeeper
+    healthcheck:
+      test: curl -s http://kafka:9092 >/dev/null || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 50
+#    networks:
+#      - my-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: on-failure
+    container_name: 'java-mail-sender-app'
+    ports:
+      - '8081:8081'
+    env_file: ./.env
+    depends_on:
+      - elasticsearch
+      - kafka
+    environment:
+      - ELASTICSEARCH_ADDRESS=elasticsearch:9200
+      - KAFKA_ADDRESS=kafka:9092
+#    networks:
+#      - my-network
+
+networks:
+  default:
+    name: my-network
+    driver: bridge
+    external: true
