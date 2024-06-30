@@ -1,4 +1,3 @@
-
 version: 0.2
 
 phases:
@@ -14,19 +13,14 @@ phases:
   build:
     commands:
       - echo building and tagging started image on `date`
-#      - echo running mvn clean install...
-#      - mvn clean install
-      - echo building the Docker image...
-      - docker build -t $REPOSITORY_URI:latest .
-      - echo tagging the Docker image...
-      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+      - echo building the Docker images...
+      - docker-compose -f docker-compose.yml build
 
   post_build:
     commands:
-      - echo pushing Docker image to Amazon ECR started on `date`
+      - echo pushing Docker images to Amazon ECR started on `date`
       - echo pushing to repository...
-      - docker push $REPOSITORY_URI:latest
-      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - docker-compose -f docker-compose.yml push
       - echo setting container name...
       - DOCKER_CONTAINER_NAME=cdicontainer
       - echo writing image definitions file...
