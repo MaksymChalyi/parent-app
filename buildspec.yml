@@ -14,13 +14,20 @@ phases:
     commands:
       - echo building and tagging started image on `date`
       - echo building the Docker images...
-      - docker-compose -f docker-compose.yml build
+
+      # Build each service individually
+      - docker-compose -f docker-compose.yml build app
+      - docker-compose -f docker-compose.yml build gateway
 
   post_build:
     commands:
       - echo pushing Docker images to Amazon ECR started on `date`
       - echo pushing to repository...
-      - docker-compose -f docker-compose.yml push
+
+      # Push each built image to ECR
+      - docker-compose -f docker-compose.yml push app
+      - docker-compose -f docker-compose.yml push gateway
+
       - echo setting container name...
       - DOCKER_CONTAINER_NAME=cdicontainer
       - echo writing image definitions file...

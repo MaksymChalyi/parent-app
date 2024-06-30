@@ -96,6 +96,7 @@ services:
     build:
       context: ./SpringBootRESTfulAPI
       dockerfile: Dockerfile
+      target: app
     container_name: 'java-app'
     ports:
       - '8080:8080'
@@ -112,6 +113,7 @@ services:
     build:
       context: ./gateway-service-v2
       dockerfile: Dockerfile
+      target: gateway
     container_name: 'spring-cloud-gatewayV2'
     ports:
       - '1000:1000'
