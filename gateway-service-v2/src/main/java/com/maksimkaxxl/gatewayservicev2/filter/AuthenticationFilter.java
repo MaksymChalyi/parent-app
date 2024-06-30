@@ -58,6 +58,10 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     configuration.addAllowedOriginPattern("https://accounts.google.com");
     configuration.addAllowedHeader("Authorization");
     configuration.addAllowedMethod("GET");
+    configuration.addAllowedMethod("POST");
+    configuration.addAllowedMethod("PUT");
+    configuration.addAllowedMethod("DELETE");
+    configuration.addAllowedMethod("OPTIONS");
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);
