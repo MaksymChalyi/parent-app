@@ -1,0 +1,1 @@
+![AnimationOfWork.gif](img%2FAnimationOfWork.gif)
